@@ -62,6 +62,7 @@ export type CVGProps = ComponentProps<"svg"> & {
 export function CVG(props: CVGProps) {
   const svgProps = {
     ...props,
+    xmlns: "http://www.w3.org/2000/svg",
     viewBox: props.def[0],
     def: undefined,
     alt: undefined,

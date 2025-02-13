@@ -15,14 +15,36 @@
     "url": "https://chris-pikul.com"
   },
   "type": "module",
+  "exports": {
+    ".": "./lib/index.js",
+    "./icons": "./lib/icons/index.js",
+    "./icons/*": "./lib/icons/*.js",
+    "./manifest": "./lib/manifest.js"
+  },
+  "files": [
+    "lib"
+  ],
   "scripts": {
-    "build:base": "tsc",
-    "build": "npm run build:base"
+    "clean": "rimraf build gen lib",
+    "gen:optimize": "node ./tasks/optimize",
+    "gen": "npm run clean && npm run gen:optimize",
+    "build:base": "tsc src/*.ts",
+    "build:gen": "tsc gen/**/*.ts",
+    "build": "npm run gen && npm run build:base && npm run build:gen",
+    "prepublish": "npm run build",
+    "preversion": "npm run build",
+    "postversion": "git push --follow-tags"
   },
   "devDependencies": {
     "@carbon/icons": "^11.55.0",
     "@types/react": "^19.0.8",
+    "fast-xml-parser": "^4.5.1",
+    "rimraf": "^6.0.1",
+    "svgo": "^3.3.2",
     "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "react": "^17.0"
   },
   "peerDependencies": {
     "react": "^17.0"

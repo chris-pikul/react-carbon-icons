@@ -8,6 +8,7 @@
     "allowJs": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     "strict": true,
     "noImplicitAny": true,
@@ -16,12 +17,12 @@
     "noImplicitThis": true,
 
     "baseUrl": ".",
-    "rootDir": "src",
+    "rootDirs": ["src", "gen"],
 
     "outDir": "build/base",
     "sourceMap": true,
     "declaration": true
   },
-  "include": ["src"],
+  "include": ["./src/*", "./gen/*"],
   "exclude": ["node_modules", ".yarn"]
 }

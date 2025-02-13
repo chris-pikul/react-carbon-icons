@@ -1,0 +1,106 @@
+#!/usr/bin/env node
+import Path from "node:path";
+import { existsSync, mkdirSync } from "node:fs";
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { optimize } from "svgo";
+
+const optimizationOptions = {
+  floatPrecision: 2,
+  multipass: true,
+  plugins: [
+    "cleanupAttrs",
+    "cleanupIds",
+    "cleanupListOfValues",
+    "cleanupListOfValues",
+    "collapseGroups",
+    "convertEllipseToCircle",
+    "convertPathData",
+    "convertShapeToPath",
+    "convertStyleToAttrs",
+    "convertTransform",
+    "mergePaths",
+    "removeComments",
+    "removeDesc",
+    "removeDimensions",
+    "removeDoctype",
+    "removeEditorsNSData",
+    "removeEmptyAttrs",
+    "removeEmptyContainers",
+    "removeEmptyText",
+    "removeHiddenElems",
+    "removeMetadata",
+    "removeOffCanvasPaths",
+    "removeUnknownsAndDefaults",
+    "removeUnusedNS",
+    "removeUselessDefs",
+    "removeUselessStrokeAndFill",
+    "removeXMLNS",
+    "removeXlink",
+    "reusePaths",
+    "sortAttrs",
+  ],
+};
+
+// Patch __dirname in case we don't have it. Unsure about the effectiveness of
+// this, but as the old adage goes... "it works on my machine"
+if (!("__dirname" in global)) global.__dirname = import.meta.dir ?? ".";
+
+const rootDir = Path.resolve(__dirname);
+
+const srcDir = Path.join(rootDir, "node_modules", "@carbon", "icons", "svg");
+if (!existsSync(srcDir)) {
+  console.error(
+    `Missing dependency @carbon/icons, expected it to be within the node_modules folder!`
+  );
+  process.exit(1);
+}
+
+const genDir = Path.join(rootDir, "gen");
+if (!existsSync(genDir)) {
+  mkdirSync(genDir, { recursive: true });
+  console.log('Created output "gen" directory.');
+}
+
+const iconsDir = Path.join(genDir, "icons");
+if (!existsSync(iconsDir)) {
+  mkdirSync(iconsDir, { recursive: true });
+  console.log('Created output "gen/icons" directory.');
+}
+
+function cleanFileName(file) {
+  if (/^\d\d[\\\/]/.test(file)) file = file.substring(3);
+
+  const slashInd = file.indexOf(Path.sep);
+  if (slashInd > 0) {
+    return null;
+    //file = file.substring(0, slashInd) + "-" + file.substring(slashInd + 1);
+  }
+
+  return file;
+}
+
+// Get the paths of all the SVG files so we can start optimizing each and placing
+// into the icons folder.
+let fileName;
+let source;
+let optStr;
+for (const file of await readdir(srcDir, { recursive: true })) {
+  if (!file.endsWith(".svg")) continue;
+  // Filter and normalize filenames to remove sub-paths
+  fileName = cleanFileName(file);
+  if (!fileName) {
+    console.log(`Rejecting file "${file}".`);
+    continue;
+  }
+
+  // Optimize input source
+  source = await readFile(Path.join(srcDir, file));
+  optStr = optimize(source, optimizationOptions);
+
+  // Write to file
+  await writeFile(Path.join(iconsDir, fileName), optStr.data, {
+    encoding: "utf-8",
+  });
+}
+
+console.log("Completed optimization of source SVG files");
