@@ -102,3 +102,22 @@ await writeFile(manifestPath, JSON.stringify(manifest, null, 2), {
   encoding: "utf-8",
 });
 console.log(`Wrote manifest file "${manifestPath}"`);
+
+console.log("Generating TS version of manifest...");
+const tsManifestPath = Path.join(genDir, "manifest.ts");
+await writeFile(
+  tsManifestPath,
+  `/* AUTO-GENERATED FILE DO NOT MODIFY */
+import type { CVGDefinition } from './CVG';
+
+export const IconDefinitions = ${JSON.stringify(
+    manifest,
+    null,
+    2
+  )} satisfies Record<string, CVGDefinition>;
+
+export type IconKey = keyof typeof IconDefinitions;
+`,
+  { encoding: "utf-8" }
+);
+console.log(`Wrote TS manifest file "${tsManifestPath}"`);
