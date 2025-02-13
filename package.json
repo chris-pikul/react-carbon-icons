@@ -29,9 +29,7 @@
     "gen:optimize": "node ./tasks/optimize",
     "gen:convert": "node ./tasks/convert",
     "gen": "npm run clean && npm run gen:optimize && npm run gen:convert",
-    "build:base": "tsc src/*.ts",
-    "build:gen": "tsc gen/**/*.ts",
-    "build": "npm run gen && npm run build:base && npm run build:gen",
+    "build": "npm run gen && tsc",
     "prepublish": "npm run build",
     "preversion": "npm run build",
     "postversion": "git push --follow-tags"

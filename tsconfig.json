@@ -19,7 +19,7 @@
     "baseUrl": ".",
     "rootDirs": ["src", "gen"],
 
-    "outDir": "build/base",
+    "outDir": "build",
     "sourceMap": true,
     "declaration": true
   },
