@@ -49,7 +49,17 @@ function convertElemObj(key, obj) {
 }
 
 function convert(src) {
-  const viewBox = src.svg._viewBox;
+  let root;
+  const rootAttrs = Object.entries(src.svg).filter(([key]) =>
+    key.startsWith("_")
+  );
+  if (rootAttrs.length === 1 && rootAttrs[0][0] === "_viewBox") {
+    root = rootAttrs[0][1];
+  } else {
+    console.log(`Non-standard attributes in SVG: `, rootAttrs);
+    throw new Error("dev break");
+  }
+
   const elems = Object.entries(src.svg)
     .filter(([key]) => !key.startsWith("_"))
     .map(([key, obj]) => {
@@ -63,7 +73,7 @@ function convert(src) {
     })
     .flat(1);
 
-  return [viewBox, ...elems];
+  return [root, ...elems];
 }
 
 function formatKey(file) {
