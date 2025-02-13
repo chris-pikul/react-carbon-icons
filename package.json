@@ -27,7 +27,8 @@
   "scripts": {
     "clean": "rimraf build gen lib",
     "gen:optimize": "node ./tasks/optimize",
-    "gen": "npm run clean && npm run gen:optimize",
+    "gen:convert": "node ./tasks/convert",
+    "gen": "npm run clean && npm run gen:optimize && npm run gen:convert",
     "build:base": "tsc src/*.ts",
     "build:gen": "tsc gen/**/*.ts",
     "build": "npm run gen && npm run build:base && npm run build:gen",

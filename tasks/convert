@@ -1,0 +1,94 @@
+#!/usr/bin/env node
+import Path from "node:path";
+import { existsSync } from "node:fs";
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { XMLParser } from "fast-xml-parser";
+
+// Patch __dirname in case we don't have it. Unsure about the effectiveness of
+// this, but as the old adage goes... "it works on my machine"
+if (!("__dirname" in global)) global.__dirname = import.meta.dir ?? ".";
+
+const rootDir = Path.resolve(__dirname);
+const genDir = Path.join(rootDir, "gen");
+if (!existsSync(genDir)) {
+  console.error(`Required generation directory "${genDir}" does not exist!`);
+  process.exit(1);
+}
+
+const iconsDir = Path.join(genDir, "icons");
+if (!existsSync(genDir)) {
+  console.error(`Required icons directory "${genDir}" does not exist!`);
+  process.exit(1);
+}
+
+// Start processing all the optimized SVG files that we made with ./optimize
+const parser = new XMLParser({
+  removeNSPrefix: true,
+  ignoreAttributes: false,
+  attributeNamePrefix: "_",
+});
+
+/**
+ * Converts a child element into CVG.
+ * @param {string} key
+ * @param {object} obj
+ */
+function convertElemObj(key, obj) {
+  if (key === "path" && Object.keys(obj).length === 1 && "_d" in obj) {
+    // Qualifies for short-handing
+    return obj._d;
+  }
+  return [
+    key,
+    Object.fromEntries(
+      Object.entries(obj)
+        .filter(([attr]) => attr.startsWith("_"))
+        .map(([attr, value]) => [attr.substring(1), value])
+    ),
+  ];
+}
+
+function convert(src) {
+  const viewBox = src.svg._viewBox;
+  const elems = Object.entries(src.svg)
+    .filter(([key]) => !key.startsWith("_"))
+    .map(([key, obj]) => {
+      if (Array.isArray(obj)) {
+        // Input is an array, which means there is multiple of these types.
+        return obj.map((sub) => convertElemObj(key, sub));
+      } else {
+        // Input is an JS object
+        return [convertElemObj(key, obj)];
+      }
+    })
+    .flat(1);
+
+  return [viewBox, ...elems];
+}
+
+function formatKey(file) {
+  const dotInd = file.indexOf(".");
+  if (dotInd > 0) file = file.substring(0, dotInd);
+  return file.replaceAll("--", "-").toLowerCase();
+}
+
+// Manifest will be used to store all key->def entries for all icons.
+const manifest = {};
+
+console.log("Converting all raw SVG files...");
+let source, svg, output;
+for (const file of await readdir(iconsDir, { recursive: true })) {
+  if (!file.endsWith(".svg")) continue;
+  source = await readFile(Path.join(iconsDir, file));
+  svg = parser.parse(source);
+  output = convert(svg);
+  if (!output) continue;
+  manifest[formatKey(file)] = output;
+}
+
+console.log("Generating manifest file...");
+const manifestPath = Path.join(genDir, "manifest.json");
+await writeFile(manifestPath, JSON.stringify(manifest, null, 2), {
+  encoding: "utf-8",
+});
+console.log(`Wrote manifest file "${manifestPath}"`);
