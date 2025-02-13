@@ -1,0 +1,29 @@
+{
+  "name": "react-carbon-icons",
+  "description": "Optimized SVG icons from the IBM Carbon design system for React",
+  "keywords": [
+    "react",
+    "icon",
+    "ibm",
+    "carbon",
+    "svg",
+    "component"
+  ],
+  "author": {
+    "name": "Chris Pikul",
+    "url": "https://chris-pikul.com"
+  },
+  "type": "module",
+  "scripts": {
+    "build:base": "tsc",
+    "build": "npm run build:base"
+  },
+  "devDependencies": {
+    "@carbon/icons": "^11.55.0",
+    "@types/react": "^19.0.8",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "react": "^17.0"
+  }
+}
