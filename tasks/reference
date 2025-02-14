@@ -1,0 +1,55 @@
+#!/usr/bin/env node
+import Path from "node:path";
+import { existsSync, mkdirSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+
+// Patch __dirname in case we don't have it. Unsure about the effectiveness of
+// this, but as the old adage goes... "it works on my machine"
+if (!("__dirname" in global)) global.__dirname = import.meta.dir ?? ".";
+
+const rootDir = Path.resolve(__dirname);
+const genDir = Path.join(rootDir, "gen");
+if (!existsSync(genDir)) {
+  console.error(`Required generation directory "${genDir}" does not exist!`);
+  process.exit(1);
+}
+
+/**
+ * Makes a JS identifier from a given key by converting it to PascalCase
+ * @param key Input key
+ * @returns {string} Identifier
+ */
+function makeIdent(key) {
+  if (/^\d/.test(key)) key = "N" + key;
+  else key = key.charAt(0).toLocaleUpperCase() + key.substring(1);
+  return key.replace(/[_\-]./g, (match) =>
+    match.substring(1).toLocaleUpperCase()
+  );
+}
+
+// Read manifest which has all our definitions
+const manifest = JSON.parse(
+  await readFile(Path.join(genDir, "manifest.json"), { encoding: "utf-8" })
+);
+
+const table = [];
+let ident;
+for (const [key] of Object.entries(manifest)) {
+  ident = makeIdent(key);
+  table.push(`| ${key} | ${ident}Icon | \`react-carbon-icons/icons/${key}\` |`);
+}
+
+await writeFile(
+  Path.join(rootDir, "reference-table.md"),
+  `# React Carbon Icons Reference Table
+
+The following is a table of all the available icons presented by their key which
+can be used with \`<Icon name={key} />\`, the named export version, and the import
+path in which the named export resides.
+
+| Key | Named Export | Import Path |
+|-----|--------------|-------------|
+${table.join("\n")}
+`,
+  { encoding: "utf-8" }
+);

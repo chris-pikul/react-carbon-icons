@@ -34,6 +34,7 @@
     "build:ts": "tsc",
     "build:pack": "node ./tasks/package",
     "build": "npm run gen && npm run build:ts && npm run build:pack",
+    "doc": "node ./tasks/reference",
     "prepublish": "npm run build",
     "postversion": "git push --follow-tags"
   },
