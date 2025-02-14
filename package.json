@@ -1,7 +1,7 @@
 {
   "name": "react-carbon-icons",
   "description": "Optimized SVG icons from the IBM Carbon design system for React",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha",
   "keywords": [
     "react",
     "icon",
@@ -21,7 +21,9 @@
     "./manifest": "./lib/manifest.js"
   },
   "files": [
-    "lib"
+    "lib",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "clean": "rimraf build gen lib",
