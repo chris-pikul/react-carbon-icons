@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+import Path from "node:path";
+import { existsSync, mkdirSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
+
+// Patch __dirname in case we don't have it. Unsure about the effectiveness of
+// this, but as the old adage goes... "it works on my machine"
+if (!("__dirname" in global)) global.__dirname = import.meta.dir ?? ".";
+
+const rootDir = Path.resolve(__dirname);
+const genDir = Path.join(rootDir, "gen");
+if (!existsSync(genDir)) {
+  console.error(`Required generation directory "${genDir}" does not exist!`);
+  process.exit(1);
+}
+
+const iconsDir = Path.join(genDir, "icons");
+if (!existsSync(iconsDir)) {
+  mkdirSync(iconsDir, { recursive: true });
+  console.log('Created output "gen/icons" directory.');
+}
+
+/**
+ * Makes a JS identifier from a given key by converting it to PascalCase
+ * @param key Input key
+ * @returns {string} Identifier
+ */
+function makeIdent(key) {
+  if (/^\d/.test(key)) key = "N" + key;
+  else key = key.charAt(0).toLocaleUpperCase() + key.substring(1);
+  return key.replace(/[_\-]./g, (match) =>
+    match.substring(1).toLocaleUpperCase()
+  );
+}
+
+const template = (identifier, def) => `/* AUTO-GENERATED FILE DO NOT MODIFY */
+import { type CVGDefinition } from '../CVG';
+import { IconBase, type IconBaseProps } from '../IconBase';
+
+export const ${identifier}Def: CVGDefinition = ${JSON.stringify(def, null, 2)};
+export const ${identifier}Icon = (props: IconBaseProps) => IconBase(${identifier}Def, props);
+export default ${identifier}Icon;
+`;
+
+// Read manifest which has all our definitions
+const manifest = JSON.parse(
+  await readFile(Path.join(genDir, "manifest.json"), { encoding: "utf-8" })
+);
+
+console.log("Writing individual component files...");
+let ident, output;
+for (const [key, def] of Object.entries(manifest)) {
+  ident = makeIdent(key);
+  output = template(ident, def);
+  await writeFile(Path.join(iconsDir, `${key}.ts`), output, {
+    encoding: "utf-8",
+  });
+}
+console.log("Completed exporting of React components.");

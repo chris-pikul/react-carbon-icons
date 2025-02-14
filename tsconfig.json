@@ -23,6 +23,6 @@
     "sourceMap": true,
     "declaration": true
   },
-  "include": ["./src/*", "./gen/*"],
+  "include": ["./src/**/*", "./gen/**/*"],
   "exclude": ["node_modules", ".yarn"]
 }

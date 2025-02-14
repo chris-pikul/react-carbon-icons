@@ -15,9 +15,9 @@ if (!existsSync(genDir)) {
   process.exit(1);
 }
 
-const iconsDir = Path.join(genDir, "icons");
-if (!existsSync(genDir)) {
-  console.error(`Required icons directory "${genDir}" does not exist!`);
+const svgDir = Path.join(genDir, "svg");
+if (!existsSync(svgDir)) {
+  console.error(`Required svg directory "${svgDir}" does not exist!`);
   process.exit(1);
 }
 
@@ -87,9 +87,9 @@ const manifest = {};
 
 console.log("Converting all raw SVG files...");
 let source, svg, output;
-for (const file of await readdir(iconsDir, { recursive: true })) {
+for (const file of await readdir(svgDir, { recursive: true })) {
   if (!file.endsWith(".svg")) continue;
-  source = await readFile(Path.join(iconsDir, file));
+  source = await readFile(Path.join(svgDir, file));
   svg = parser.parse(source);
   output = convert(svg);
   if (!output) continue;

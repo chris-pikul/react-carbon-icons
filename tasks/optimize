@@ -79,10 +79,10 @@ if (!existsSync(genDir)) {
   console.log('Created output "gen" directory.');
 }
 
-const iconsDir = Path.join(genDir, "icons");
-if (!existsSync(iconsDir)) {
-  mkdirSync(iconsDir, { recursive: true });
-  console.log('Created output "gen/icons" directory.');
+const svgDir = Path.join(genDir, "svg");
+if (!existsSync(svgDir)) {
+  mkdirSync(svgDir, { recursive: true });
+  console.log('Created output "gen/svg" directory.');
 }
 
 function cleanFileName(file) {
@@ -116,7 +116,7 @@ for (const file of await readdir(srcDir, { recursive: true })) {
   optStr = optimize(source, optimizationOptions);
 
   // Write to file
-  await writeFile(Path.join(iconsDir, fileName), optStr.data, {
+  await writeFile(Path.join(svgDir, fileName), optStr.data, {
     encoding: "utf-8",
   });
 }
