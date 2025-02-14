@@ -1,6 +1,10 @@
 # React Carbon Icons
 
-Optimized SVG icons from the [IBM Carbon Design System](https://carbondesignsystem.com/elements/icons/library/) for React. All the available icons in [@carbon/icons](https://github.com/carbon-design-system/carbon/tree/main/packages/icons) have been optimized using [SVGO](https://svgo.dev/), compressed using a simple format called CVG (my own creation), and then exported as tiny importable React components.
+Optimized SVG icons from the [IBM Carbon Design System](https://carbondesignsystem.com/elements/icons/library/)
+for React. All the available icons in [@carbon/icons](https://github.com/carbon-design-system/carbon/tree/main/packages/icons)
+have been optimized using [SVGO](https://svgo.dev/), compressed using a simple
+format called CVG (my own creation), and then exported as tiny importable React
+components.
 
 ## Installation
 
@@ -54,6 +58,11 @@ are exported both as named components and as the default.
 
 Refer to the [Reference Table](./reference-table.md) for a list of all the available
 icon keys and their exported identifier.
+
+## Why not @carbon/icons-react?
+
+I personally found the quality of that library lacking. The SVG is not fully
+optimized and the package size is a bit too large for my taste.
 
 ## CVG Compression
 
