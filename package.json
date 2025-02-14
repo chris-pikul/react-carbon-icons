@@ -17,7 +17,6 @@
   "type": "module",
   "exports": {
     ".": "./lib/index.js",
-    "./icons": "./lib/icons/index.js",
     "./icons/*": "./lib/icons/*.js",
     "./manifest": "./lib/manifest.js"
   },
@@ -31,7 +30,8 @@
     "gen:reactify": "node ./tasks/reactify",
     "gen": "npm run clean && npm run gen:optimize && npm run gen:convert && npm run gen:reactify",
     "build:ts": "tsc",
-    "build": "npm run gen && npm run build:ts",
+    "build:pack": "node ./tasks/package",
+    "build": "npm run gen && npm run build:ts && npm run build:pack",
     "prepublish": "npm run build",
     "preversion": "npm run build",
     "postversion": "git push --follow-tags"
