@@ -1,4 +1,9 @@
-import { createElement, type ReactNode, type ComponentProps } from "react";
+import {
+  createElement,
+  type ReactNode,
+  type ComponentProps,
+  useMemo,
+} from "react";
 
 /**
  * Defines a shape/path for SVG. Can either be a single string in which case it
@@ -68,11 +73,13 @@ export function CVG(props: CVGProps) {
     alt: undefined,
   } as ComponentProps<"svg">;
 
+  const children = useMemo(() => hydrateCVG(props.def), [props.def]);
+
   return createElement(
     "svg",
     svgProps,
     props.alt ? createElement("title", null, props.alt) : null,
-    ...hydrateCVG(props.def)
+    ...children
   );
 }
 export default CVG;
